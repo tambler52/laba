@@ -1,0 +1,7 @@
+fio = input("Введите ФИО")
+parts = fio.split()
+print(parts)
+familiya = parts[0].capitalize()
+imya = parts[1][0].upper()
+otchestvo = parts[2][0].upper()
+print(familiya + " " + imya + "." + otchestvo + ".")
