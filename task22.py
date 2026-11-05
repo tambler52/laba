@@ -1,11 +1,11 @@
 def type_check(*expected_types):
     def decorator(func):
-        def new_func(*args, **kwargs):
+        def wrapper(*args, **kwargs):
             for i in range(len(args)):
                 if type(args[i]) != expected_types[i]:
                     raise TypeError("неверный тип аргумента " + str(i + 1))
             return func(*args, **kwargs)
-        return new_func
+        return wrapper
     return decorator
 
 
