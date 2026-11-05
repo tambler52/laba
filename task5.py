@@ -1,5 +1,5 @@
-a = int(input("введите первое"))
-b = int(input("введите второе"))
+a = float(input("введите первое"))
+b = float(input("введите второе"))
 print(a+b)
 print(a-b)
 print(a*b)
