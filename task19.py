@@ -10,7 +10,7 @@ def cache(func):
             print("считаем",args,kwargs)
             res = func(*args,**kwargs)
             saved_results[key] = res
-            return res
+        return res
         
     return wrapper
 
