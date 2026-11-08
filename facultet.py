@@ -1,13 +1,13 @@
 class Student:
     
-    def __init__(self,name,specialty):
+    def __init__(self,name,specialty,student_id):
+        self.id = student_id
         self.name = name
         self.specialty = specialty
         self.spisok_discp = []
         self.marks = {}
 
-        pass
-    pass
+        
 
 
 
@@ -18,8 +18,7 @@ class Discipline:
         self.name = name
         self.specialty = specialty
         self.kafedra = kafedra
-        pass
-    pass
+        
 
 
 
@@ -27,8 +26,7 @@ class Kafedra:
     def __init__(self,name):
         self.name = name
         self.spisok_discp = []
-        pass
-    pass
+        
 
 
 class Faculty:
@@ -36,20 +34,169 @@ class Faculty:
         self.name = name
         self.students = []
         self.spisok_kafedr = []
-        pass
-    pass
+    def find_student(self, stud_id):
+        for student in self.students:
+            if student.id == stud_id:
+                return student
+        return None
+
+    def zachislit_studenta(self, name, specialty,stud_id):
+        new_student = Student(name, specialty,stud_id)
+        self.students.append(new_student)
+        print("студент", name, "зачислен")
+
+    def otchislit_studenta(self, stud_id):
+        student = self.find_student(stud_id)
+        if student is None:
+            print("студент не найден")
+            return
+        self.students.remove(student)
+        print("студент", student.name, "отчислен")
+
+    def zapisat_na_discp(self, stud_id, discp_name):
+        student = self.find_student(stud_id)
+        if student is None:
+            print("студент не найден")
+            return
+        
+        discp = None
+        for kaf in self.spisok_kafedr:
+            for discpline in kaf.spisok_discp:
+                if discpline.name == discp_name:
+                    discp = discpline
+                    break
+            if discp is not None:
+                break
+        
+        if discp is None:
+            print("дисциплина не найдена")
+            return
+        
+        if student.specialty not in discp.specialty:
+            print("ошибка: дисциплина не для этой специальности")
+            return
+        
+        if discp in student.spisok_discp:
+            print("студент уже записан на эту дисциплину")
+            return
+        
+        student.spisok_discp.append(discp)
+        print("студент", student.name, "записан на", discp_name)
+
+    def vstavit_ocenku(self, stud_id, discp_name, mark):
+        student = self.find_student(stud_id)
+        if student is None:
+            print("студент не найден")
+            return
+        
+        discp = None
+        for discpline in student.spisok_discp:
+            if discpline.name == discp_name:
+                discp = discpline
+                break
+        
+        if discp is None:
+            print("студент не записан на эту дисциплину")
+            return
+        
+        if mark < 2 or mark > 10:
+            print("оценка должна быть от 2 до 10")
+            return
+        
+        student.marks[discp.name] = mark
+        print("оценка", mark, "выставлена студенту", student.name, "по", discp_name)
+
+    def udalit_s_discp(self, stud_id, discp_name):
+        student = self.find_student(stud_id)
+        if student is None:
+            print("студент не найден")
+            return
+        
+        discp = None
+        for discpline in student.spisok_discp:
+            if discpline.name == discp_name:
+                discp = discpline
+                break
+        
+        if discp is None:
+            print("студент не записан на эту дисциплину")
+            return
+        
+        student.spisok_discp.remove(discp)
+        student.marks.pop(discp.name, None)
+        print("студент", student.name, "удалён c дисциплины", discp_name)
+
+    def perevesti_semestr(self, stud_id):
+        student = self.find_student(stud_id)
+        if student is None:
+            print("студент не найден")
+            return
+        
+        if len(student.spisok_discp) == 0:
+            print("нет дисциплин для перевода")
+            return
+        
+        vse_ocenki_est = True
+        for discpline in student.spisok_discp:
+            if discpline.name not in student.marks:
+                vse_ocenki_est = False
+                break
+        
+        if not vse_ocenki_est:
+            print("не все дисциплины изучены")
+            return
+        
+        vse_horosho = True
+        for grade in student.marks.values():
+            if grade < 4:
+                vse_horosho = False
+                break
+        
+        if not vse_horosho:
+            print("есть неудовлетворительные оценки")
+            return
+        
+        student.spisok_discp = []
+        student.marks = {}
+        print("студент", student.name, "переведён в следующий семестр")
+
+    def vedomost(self, stud_id):
+        student = self.find_student(stud_id)
+        if student is None:
+            print("студент не найден")
+            return
+        
+        with open("vedomost.txt", "w", encoding="utf-8") as file:
+            file.write("id студента: " + str(student.id))
+            file.write("студент: " + student.name + "\n")
+            file.write("специальность: " + student.specialty + "\n")
+            file.write("дисциплины и оценки:\n")
+            
+            for discp in student.spisok_discp:
+                ocenka = student.marks.get(discp.name, "нет оценки")
+                file.write("  " + discp.name + " (кафедра: " + discp.kafedra.name + "): " + str(ocenka) + "\n")
+            
+            if len(student.marks) > 0:
+                summa = 0
+                for grade in student.marks.values():
+                    summa = summa + grade
+                sredniy = summa / len(student.marks)
+                file.write("средний балл: " + str(sredniy) + "\n")
+            else:
+                file.write("средний балл: нет оценок\n")
+        
+        print("ведомость сохранена в файл vedomost.txt")
+       
 
 faculty = Faculty("РФиКТ")
 kafedra = Kafedra("Биоинформатика")
 
-d1 = Discipline("Биоинформатика", "прикладная информатика", kafedra)
-d2 = Discipline("Базы данных", "прикладная информатика", kafedra)
+d1 = Discipline("Биоинформатика", ["прикладная информатика", "кибербезопасность"], kafedra)
+d2 = Discipline("Базы данных", ["прикладная информатика"], kafedra)
 
 
 kafedra.spisok_discp.append(d1)
 kafedra.spisok_discp.append(d2)
-
-
 faculty.spisok_kafedr.append(kafedra)
 
 
@@ -71,175 +218,43 @@ while True:
     if choice == "0":
         break
     elif choice == "1":
-        new_name = input("введите имя: ")
-        new_spec = input("введите специальность: ")
-        new_student = Student(new_name, new_spec)
-        faculty.students.append(new_student)
+        new_name = input("введите имя:")
+        new_spec = input("введите специальность:")
+        stud_id = int(input("введите id:"))
+        new_student = Student(new_name, new_spec, stud_id)
+        faculty.zachislit_studenta(new_name,new_spec,stud_id)
         print("студент", new_name, "зачислен")
     elif choice == "2":
         print("список студентов:")
-        for s in faculty.students:
-            print("  ", s.name, "-", s.specialty)
-    elif choice == '3':
-        name_to_delete = input("введите имя студента для отчисления")
         for student in faculty.students:
-            if student.name == name_to_delete:
-                faculty.students.remove(student)
-                print("студент",name_to_delete,"отчислен")
-                break
-        else:
-            print("студент не найден")   
+            print("  ", student.name, 'id',student.id, "-", student.specialty)
+    elif choice == '3':
+        stud_id = int(input("введите id студента для отчисления:"))
+        faculty.otchislit_studenta(stud_id) 
     elif choice == "4":
-       stud_name = input()
-       discp_name = input()
-
-       naydennyy_student = None
-       for student in faculty.students:
-           if student.name == stud_name:
-               naydennyy_student = student
-               break
-       if naydennyy_student is None:
-           print("студент не найден")
-           continue
-    
-       naydennaya_discp = None
-       for kafedra in faculty.spisok_kafedr:
-           for discp in kafedra.spisok_discp:
-               if discp.name == discp_name:
-                  naydennaya_discp = discp
-                  break
-       if naydennaya_discp is None:
-           print("нет такой дисциплины")
-           continue
-       if naydennaya_discp.specialty != naydennyy_student.specialty:
-           print("Ошибка: не для этой специальности")
-           continue
-       if naydennaya_discp in naydennyy_student.spisok_discp:
-           print("Уже записан")
-           continue
-       naydennyy_student.spisok_discp.append(naydennaya_discp)
-       print("Студент записан")
-        
+       stud_id = int(input("введите id студента:"))
+       discp_name = input("введите название дисциплины")
+       faculty.zapisat_na_discp(stud_id,discp_name)
        
     elif choice == '5':
-       print("введите имя студента")
-       stud_name = input()
-       print("введите дисциплину")
-       discp_name = input()
-       mark = int(input())
-       naydennyy_student = None
-       for student in faculty.students:
-           if student.name == stud_name:
-               naydennyy_student = student
-               break
-       if naydennyy_student is None:
-        print("такого студента нет")
-        continue
-       naydennaya_discp = None
-       for discp in naydennyy_student.spisok_discp:
-           if discp.name == discp_name:
-               naydennaya_discp = discp
-               break
-       if naydennaya_discp is None:
-           print("такой дисциплины нету")
-           continue
-        
-       if mark < 2 or mark > 10:
-           print("оценка должна быть от 2 до 10")
-           continue    
+       stud_id = int(input("введите id студента:"))
+       discp_name = input("введите название дисциплины")
+       mark = int(input("введите отметку"))
+       faculty.vstavit_ocenku(stud_id,discp_name,mark)
        
-       naydennyy_student.marks[naydennaya_discp.name] = mark
-       print("оценка", mark, "выставлена студенту", stud_name, "по", discp_name)
-
     elif choice == '6':
-        stud_name = input()
-        discp_name = input()
-        naydennyy_student = None
-        for student in faculty.students:
-            if student.name == stud_name:
-                naydennyy_student = student
-                break
-        if naydennyy_student is None:
-            print("такого студента нет")
-            continue   
-        naydennaya_discp = None
-        for discp in naydennyy_student.spisok_discp:
-           if discp.name == discp_name:
-               naydennaya_discp = discp
-               naydennyy_student.spisok_discp.remove(discp)
-               naydennyy_student.marks.pop(discp.name, None)
-               print("студент удален c дисциплины")
-               break
-        if naydennaya_discp is None:
-           print("такой дисциплины нету")
-           continue  
-
+        stud_id = int(input("введите id студента:"))
+        discp_name = input("введите дисциплину")
+        faculty.udalit_s_discp(stud_id,discp_name)
+    
 
     elif choice == '7':
-        stud_name = input()
-        naydennyy_student = None
-        for student in faculty.students:
-            if student.name == stud_name:
-                naydennyy_student = student
-                break
-        if naydennyy_student is None:
-            print("такого студента нет")
-            continue
-
-        if len(naydennyy_student.spisok_discp) == 0: 
-            print("нет дисциплин")
-            continue
-        vse_ocenki_est = True
-        for discp in naydennyy_student.spisok_discp:
-            if discp.name not in naydennyy_student.marks:
-                vse_ocenki_est = False
-                break
-        if not vse_ocenki_est:
-            print("не все дисциплины изучены")
-            continue
-        vse_horosho = True
-        for grade in naydennyy_student.marks.values():
-            if grade < 4:
-                vse_horosho = False
-                break
-        if not vse_horosho: 
-            print("Есть неудовлетворительные оценки")
-            continue 
-        naydennyy_student.spisok_discp = []
-        naydennyy_student.marks = {}
-        print("Студент переведён в следующий семестр")
-                
-    elif choice == '8':
-        stud_name = input()
-        naydennyy_student = None
-        for student in faculty.students:
-            if student.name == stud_name:
-                naydennyy_student = student
-                break
-        if naydennyy_student is None:
-           print("Студент не найден")
-           continue
-        with open("vedomost.txt", "w", encoding="utf-8") as file:
-            file.write("Студент: " + naydennyy_student.name + "\n")
-            file.write("Специальность: " + naydennyy_student.specialty + "\n")
-            file.write("Дисциплины и оценки:\n")
-            
-            
-            for discp in naydennyy_student.spisok_discp:
-                ocenka = naydennyy_student.marks.get(discp.name, "нет оценки")
-                file.write("  " + discp.name + " (кафедра: " + discp.kafedra.name + "): " + str(ocenka) + "\n")
-            
-            
-            if len(naydennyy_student.marks) > 0:
-                summa = 0
-                for grade in naydennyy_student.marks.values():
-                    summa = summa + grade
-                sredniy = summa / len(naydennyy_student.marks)
-                file.write("средний балл: " + str(sredniy) + "\n")
-            else:
-                file.write("средний балл: нет оценок\n")
+        stud_id = int(input("введите id студента:"))
+        faculty.perevesti_semestr(stud_id)
         
-        print("ведомость сохранена в файл vedomost.txt")  
+    elif choice == '8':
+        stud_id = int(input("введите id студента:"))
+        faculty.vedomost(stud_id) 
     else:
         print("нет такого пункта")
         
