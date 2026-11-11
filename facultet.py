@@ -35,10 +35,16 @@ class Faculty:
         self.students = []
         self.spisok_kafedr = []
     def find_student(self, stud_id):
+        student_found = None
         for student in self.students:
             if student.id == stud_id:
-                return student
-        return None
+                student_found = student
+                break
+        if student_found is None:
+            print("нет такого студента")
+            return None
+        return student_found
+        
 
     def zachislit_studenta(self, name, specialty,stud_id):
         new_student = Student(name, specialty,stud_id)
@@ -49,7 +55,7 @@ class Faculty:
         student = self.find_student(stud_id)
         if student is None:
             print("студент не найден")
-            return
+            return None
         self.students.remove(student)
         print("студент", student.name, "отчислен")
 
@@ -57,7 +63,7 @@ class Faculty:
         student = self.find_student(stud_id)
         if student is None:
             print("студент не найден")
-            return
+            return None
         
         discp = None
         for kaf in self.spisok_kafedr:
@@ -70,15 +76,15 @@ class Faculty:
         
         if discp is None:
             print("дисциплина не найдена")
-            return
+            return None
         
         if student.specialty not in discp.specialty:
             print("ошибка: дисциплина не для этой специальности")
-            return
+            return None
         
         if discp in student.spisok_discp:
             print("студент уже записан на эту дисциплину")
-            return
+            return None
         
         student.spisok_discp.append(discp)
         print("студент", student.name, "записан на", discp_name)
@@ -87,7 +93,7 @@ class Faculty:
         student = self.find_student(stud_id)
         if student is None:
             print("студент не найден")
-            return
+            return None
         
         discp = None
         for discpline in student.spisok_discp:
@@ -101,7 +107,7 @@ class Faculty:
         
         if mark < 2 or mark > 10:
             print("оценка должна быть от 2 до 10")
-            return
+            return None
         
         student.marks[discp.name] = mark
         print("оценка", mark, "выставлена студенту", student.name, "по", discp_name)
@@ -110,7 +116,7 @@ class Faculty:
         student = self.find_student(stud_id)
         if student is None:
             print("студент не найден")
-            return
+            return None
         
         discp = None
         for discpline in student.spisok_discp:
@@ -120,7 +126,7 @@ class Faculty:
         
         if discp is None:
             print("студент не записан на эту дисциплину")
-            return
+            return None
         
         student.spisok_discp.remove(discp)
         student.marks.pop(discp.name, None)
@@ -130,11 +136,11 @@ class Faculty:
         student = self.find_student(stud_id)
         if student is None:
             print("студент не найден")
-            return
+            return None
         
         if len(student.spisok_discp) == 0:
             print("нет дисциплин для перевода")
-            return
+            return None
         
         vse_ocenki_est = True
         for discpline in student.spisok_discp:
@@ -144,7 +150,7 @@ class Faculty:
         
         if not vse_ocenki_est:
             print("не все дисциплины изучены")
-            return
+            return None
         
         vse_horosho = True
         for grade in student.marks.values():
@@ -154,7 +160,7 @@ class Faculty:
         
         if not vse_horosho:
             print("есть неудовлетворительные оценки")
-            return
+            return None
         
         student.spisok_discp = []
         student.marks = {}
@@ -164,7 +170,7 @@ class Faculty:
         student = self.find_student(stud_id)
         if student is None:
             print("студент не найден")
-            return
+            return None
         
         with open("vedomost.txt", "w", encoding="utf-8") as file:
             file.write("id студента: " + str(student.id))
