@@ -55,7 +55,7 @@ class Faculty:
         student = self.find_student(stud_id)
         if student is None:
             print("студент не найден")
-            return None
+            return 
         self.students.remove(student)
         print("студент", student.name, "отчислен")
 
@@ -63,7 +63,7 @@ class Faculty:
         student = self.find_student(stud_id)
         if student is None:
             print("студент не найден")
-            return None
+            return 
         
         discp = None
         for kaf in self.spisok_kafedr:
@@ -76,15 +76,15 @@ class Faculty:
         
         if discp is None:
             print("дисциплина не найдена")
-            return None
+            return 
         
         if student.specialty not in discp.specialty:
             print("ошибка: дисциплина не для этой специальности")
-            return None
+            return 
         
         if discp in student.spisok_discp:
             print("студент уже записан на эту дисциплину")
-            return None
+            return 
         
         student.spisok_discp.append(discp)
         print("студент", student.name, "записан на", discp_name)
@@ -93,7 +93,7 @@ class Faculty:
         student = self.find_student(stud_id)
         if student is None:
             print("студент не найден")
-            return None
+            return 
         
         discp = None
         for discpline in student.spisok_discp:
@@ -107,7 +107,7 @@ class Faculty:
         
         if mark < 2 or mark > 10:
             print("оценка должна быть от 2 до 10")
-            return None
+            return 
         
         student.marks[discp.name] = mark
         print("оценка", mark, "выставлена студенту", student.name, "по", discp_name)
@@ -116,7 +116,7 @@ class Faculty:
         student = self.find_student(stud_id)
         if student is None:
             print("студент не найден")
-            return None
+            return 
         
         discp = None
         for discpline in student.spisok_discp:
@@ -126,7 +126,7 @@ class Faculty:
         
         if discp is None:
             print("студент не записан на эту дисциплину")
-            return None
+            return 
         
         student.spisok_discp.remove(discp)
         student.marks.pop(discp.name, None)
@@ -136,11 +136,11 @@ class Faculty:
         student = self.find_student(stud_id)
         if student is None:
             print("студент не найден")
-            return None
+            return 
         
         if len(student.spisok_discp) == 0:
             print("нет дисциплин для перевода")
-            return None
+            return 
         
         vse_ocenki_est = True
         for discpline in student.spisok_discp:
@@ -150,7 +150,7 @@ class Faculty:
         
         if not vse_ocenki_est:
             print("не все дисциплины изучены")
-            return None
+            return 
         
         vse_horosho = True
         for grade in student.marks.values():
@@ -160,7 +160,7 @@ class Faculty:
         
         if not vse_horosho:
             print("есть неудовлетворительные оценки")
-            return None
+            return 
         
         student.spisok_discp = []
         student.marks = {}
@@ -170,7 +170,7 @@ class Faculty:
         student = self.find_student(stud_id)
         if student is None:
             print("студент не найден")
-            return None
+            return 
         
         with open("vedomost.txt", "w", encoding="utf-8") as file:
             file.write("id студента: " + str(student.id))
